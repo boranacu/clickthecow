@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Click the Cow Game</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #222;
+      color: white;
+      font-family: Arial, sans-serif;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #score, #timer {
+      font-size: 24px;
+      margin: 5px;
+    }
+    #cow {
+      width: 100px;
+      position: absolute;
+      cursor: pointer;
+      transition: top 0.2s, left 0.2s;
+    }
+    #gameOver {
+      display: none;
+      text-align: center;
+    }
+    #restart {
+      margin-top: 15px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background: crimson;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+    }
+    #restart:hover {
+      background: darkred;
+    }
+  </style>
+</head>
+<body>
+  <div id="score">Score: 0</div>
+  <div id="timer">Time: 30</div>
+  <img id="cow" src="cow.png" alt="cow">
+  
+  <div id="gameOver">
+    <h1>Game Over!</h1>
+    <p id="finalScore"></p>
+    <button id="restart">Restart</button>
+  </div>
+
+  <!-- Sound effects -->
+  <audio id="clickSound" src="click.mp3"></audio>
+  <audio id="gameOverSound" src="gameover.mp3"></audio>
+
+  <script>
+    const cow = document.getElementById("cow");
+    const scoreDisplay = document.getElementById("score");
+    const timerDisplay = document.getElementById("timer");
+    const gameOverScreen = document.getElementById("gameOver");
+    const finalScore = document.getElementById("finalScore");
+    const restartBtn = document.getElementById("restart");
+
+    const clickSound = document.getElementById("clickSound");
+    const gameOverSound = document.getElementById("gameOverSound");
+
+    let score = 0;
+    let timeLeft = 30;
+    let gameActive = true;
+    let timer;
+
+    function moveCow() {
+      const maxX = window.innerWidth - cow.clientWidth;
+      const maxY = window.innerHeight - cow.clientHeight;
+
+      const x = Math.floor(Math.random() * maxX);
+      const y = Math.floor(Math.random() * maxY);
+
+      cow.style.left = x + "px";
+      cow.style.top = y + "px";
+    }
+
+    function startGame() {
+      score = 0;
+      timeLeft = 30;
+      gameActive = true;
+      scoreDisplay.textContent = "Score: 0";
+      timerDisplay.textContent = "Time: 30";
+      gameOverScreen.style.display = "none";
+      cow.style.display = "block";
+
+      moveCow();
+      timer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = "Time: " + timeLeft;
+        if (timeLeft <= 0) endGame();
+      }, 1000);
+    }
+
+    function endGame() {
+      gameActive = false;
+      clearInterval(timer);
+      cow.style.display = "none";
+      finalScore.textContent = "Your Score: " + score;
+      gameOverScreen.style.display = "block";
+
+      gameOverSound.play(); // play game over sound
+    }
+
+    cow.addEventListener("click", () => {
+      if (!gameActive) return;
+      score++;
+      scoreDisplay.textContent = "Score: " + score;
+      moveCow();
+      clickSound.currentTime = 0; // reset so it plays every click
+      clickSound.play();
+    });
+
+    restartBtn.addEventListener("click", startGame);
+
+    // Start game when page loads
+    startGame();
+  </script>
+</body>
+</html>
